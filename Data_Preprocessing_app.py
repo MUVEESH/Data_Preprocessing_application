@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+import seaborn as sns
 import base64
 from sklearn.preprocessing import MinMaxScaler
 import warnings
@@ -18,11 +19,12 @@ def main():
         feature_engineering(df)
         anomaly=['none','z_score','iqr','isolation_forest']
         outlier_detection=st.selectbox("Select a Encoder", anomaly)
+        st.header("Outlier_Detection")
         if outlier_detection==z_score:
             z_score(df)
-        if outlier_detection==iqr:
+        elif outlier_detection==iqr:
             iqr(df)
-        if outlier_detection==isolation_forest:
+        elif outlier_detection==isolation_forest:
             isolation_forest(df)
         missing_values_imputation(df)
         

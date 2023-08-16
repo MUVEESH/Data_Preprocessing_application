@@ -1,0 +1,169 @@
+import streamlit as st
+import pandas as pd
+import base64
+import seaborn as sns
+from sklearn.preprocessing import MinMaxScaler
+import warnings
+warnings.filterwarnings('ignore')
+from sklearn.ensemble import IsolationForest
+from sklearn.model_selection import GridSearchCV
+
+def main():
+    st.title('DATA PREPROCESSING')
+
+    # Upload DataFrame
+    uploaded_file = st.file_uploader("Upload a CSV file", type=["csv"])
+    if uploaded_file is not None:
+        df = pd.read_csv(uploaded_file)
+        st.dataframe(df)
+        
+        # Choose preprocessing options
+        preprocessing_option = st.selectbox("Choose a preprocessing method", ["Feature Engineering", "Z-Score", "IQR", "Isolation Forest", "Missing Values Imputation"])
+        if preprocessing_option == "Feature Engineering":
+            feature_engineering(df)
+        elif preprocessing_option == "Z-Score":
+            z_score(df)
+        elif preprocessing_option == "IQR":
+            iqr(df)
+        elif preprocessing_option == "Isolation Forest":
+            isolation_forest(df)
+        elif preprocessing_option == "Missing Values Imputation":
+            missing_values_imputation(df)
+
+        # Display modified DataFrame
+        st.write("Modified DataFrame:")
+        st.dataframe(df)
+
+        # Provide download link for modified DataFrame
+        st.markdown(get_download_link(df), unsafe_allow_html=True)
+
+def feature_engineering(df):
+    st.header("Feature Engineering")
+    encoder={'Encoders':['OneHotEncoder','TargetEncoder']}
+    scaler={'Scalers':['MinMaxScaler','']}
+    for i,j in scaler.items():
+        encoder.setdefault(i,j)
+    st.write(pd.DataFrame(encoder))
+    encoder=input('Enter the encoder/scaler :')
+    if encoder=='OneHotEncoder':
+        df1=pd.get_dummies(df)
+        df.drop(df.columns, axis=1, inplace=True)
+        df2=df+df1
+        st.write(df2)
+    elif encoder=='TargetEncoder':
+        column = st.selectbox("Select a column for TargetEncoder", df.columns)
+        for j,i in enumerate(df[column].unique()):
+            cat={i:j+1}
+            df[column].replace(cat,inplace=True)
+    for column in df.columns:
+        if encoder=='MinMaxScaler':
+            scaler=MinMaxScaler()
+            scaled_value=scaler.fit_transform(df[column].values.reshape(-1,1))
+            df[column]=scaled_value
+    st.write('Done')
+
+def z_score(df):
+    st.header("Z-Score")
+    column = st.selectbox("Select a column for Z-Score", df.columns)
+    outliers=[]
+    skewness = df[column].skew()
+    kurt = df[column].kurtosis()
+    mean=df[column].mean()
+    std=df[column].std()
+    for x in df[column]:
+        z=(x-mean)/std
+        if z>3 or z<-3:
+            outliers.append(x)
+    sns.kdeplot(df[column])
+    out=0
+    for i in outliers:
+        out+=1
+    st.write(f'count of outliers: {out}')
+    st.write(f'skewness: {skewness}\nKurtosis: {kurt}')
+    st.write(f'Outliers: {outliers}')
+    remove=st.radio('Do you want to remove outliers?', ['Yes', 'No'])
+    if remove=='Yes':
+        df.drop(outliers, inplace=True)
+    st.write('Done')
+
+def iqr(df):
+    st.header("IQR")
+    column = st.selectbox("Select a column for IQR", df.columns)
+    outliers=[]
+    q1=df[column].quantile(0.25)
+    q3=df[column].quantile(0.75)
+    IQR=q3-q1
+    inner=q1-1.5*IQR
+    outer=q3+1.5*IQR
+    for x in df[column]:
+        if x<inner or x>outer:
+            outliers.append(x)
+    out=0
+    for i in outliers:
+        out+=1
+    st.write(f'count of outliers: {out}')
+    remove=st.radio('Do you want to remove outliers?', ['Yes', 'No'])
+    if remove=='Yes':
+        df.drop(outliers, inplace=True)
+    st.write('Done')
+
+def isolation_forest(df):
+    st.header("Isolation Forest")
+    model = IsolationForest()
+    grid_params = {
+        'contamination': [0.1, 0.2, 0.3, 0.4, 0.5, 0.6],
+        'n_estimators': [100, 200],
+        'max_features': [1],
+        'max_samples': ['auto', 0.7, 0.8],
+        'n_jobs': [-1]
+    }
+    grid_search = GridSearchCV(model, grid_params, scoring='roc_auc')
+    grid_search.fit(df)
+    best_model = grid_search.best_estimator_
+    best_params = grid_search.best_params_
+    # Train the best model
+    best_model.fit(df)
+    best_model.params=best_params
+    # Get scores
+    df['scores'] = best_model.decision_function(df)
+    df['anomaly_score'] = best_model.predict(df)
+    # Print
+    outliers=df[df['anomaly_score']==-1]
+    st.write(outliers)
+    remove=st.radio('Do you want to remove outliers?', ['Yes', 'No'])
+    if remove=='Yes':
+        df.drop(outliers,axis=1,inplace=True)
+        df.drop(['scores','anomaly_score'],axis=1,inplace=True)
+    else:
+        print('Done')
+    return isolation_forest
+def missing_values_imputation(df):
+    st.header("Missing Values Imputation")
+    # Your missing values imputation code here
+    print(f'{df.isna().sum()}')
+    column = st.selectbox("Select a column for simple imputation", df.columns)
+    impute=input('Enter yes or no to impute :')
+    try:
+        if impute=='yes':
+            imputor=input('Enter imputer name median/mode/iterative :')
+            if imputor==median:
+                df.fillna(df[column].median())
+            elif imputor==mode:
+                df.fillna(df[column].mode())
+            elif imputor==iterative:
+                from sklearn.impute import IterativeImputer
+                imputer=IterativeImputer(max_iter=10,random_state=0)
+                imputer.fit_transform(df)
+        else:
+            print('Done')
+    except NameError:
+        print('Error:You should type only listed - kindly rerun')
+
+def get_download_link(df):
+    csv = df.to_csv(index=False)
+    b64 = base64.b64encode(csv.encode()).decode()
+    href = f'<a href="data:file/csv;base64,{b64}" download="modified_data.csv">Download Modified CSV</a>'
+    return href
+
+if __name__ == '__main__':
+    main()

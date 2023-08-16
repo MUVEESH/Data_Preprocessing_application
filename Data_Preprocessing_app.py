@@ -19,15 +19,15 @@ def main():
         # Choose preprocessing options
         preprocessing_option = st.selectbox("Choose a preprocessing method", ["Feature Engineering", "Z-Score", "IQR", "Isolation Forest", "Missing Values Imputation"])
         if preprocessing_option == "Feature Engineering":
-            feature_engineering(df)
+            feature_engineering()
         elif preprocessing_option == "Z-Score":
-            z_score(df)
+            z_score()
         elif preprocessing_option == "IQR":
-            iqr(df)
+            iqr()
         elif preprocessing_option == "Isolation Forest":
-            isolation_forest(df)
+            isolation_forest()
         elif preprocessing_option == "Missing Values Imputation":
-            missing_values_imputation(df)
+            missing_values_imputation()
 
         # Display modified DataFrame
         st.write("Modified DataFrame:")
@@ -36,10 +36,10 @@ def main():
         # Provide download link for modified DataFrame
         st.markdown(get_download_link(df), unsafe_allow_html=True)
 
-def feature_engineering(df):
+def feature_engineering():
     st.header("Feature Engineering")
-    encoders=['OneHotEncoder','TargetEncoder','MinMaxScaler']
-    encoder=st.selectbox("Select a Encoder/Scaler", encoders)
+    encoders=['OneHotEncoder','TargetEncoder','none']
+    encoder=st.selectbox("Select a Encoder", encoders)
     if encoder=='OneHotEncoder':
         df1=pd.get_dummies(df)
         df.drop(df.columns, axis=1, inplace=True)
@@ -50,14 +50,16 @@ def feature_engineering(df):
         for j,i in enumerate(df[column].unique()):
             cat={i:j+1}
             df[column].replace(cat,inplace=True)
+    scalers=['MinMaxScaler','none']
+    scaler=st.selectbox("Select a scaler", scalers)
     for column in df.columns:
-        if encoder=='MinMaxScaler':
+        if scaler=='MinMaxScaler':
             scaler=MinMaxScaler()
             scaled_value=scaler.fit_transform(df[column].values.reshape(-1,1))
             df[column]=scaled_value
     st.write('Done')
 
-def z_score(df):
+def z_score():
     st.header("Z-Score")
     column = st.selectbox("Select a column for Z-Score", df.columns)
     outliers=[]
@@ -81,7 +83,7 @@ def z_score(df):
         df.drop(outliers, inplace=True)
     st.write('Done')
 
-def iqr(df):
+def iqr():
     st.header("IQR")
     column = st.selectbox("Select a column for IQR", df.columns)
     outliers=[]
@@ -102,7 +104,7 @@ def iqr(df):
         df.drop(outliers, inplace=True)
     st.write('Done')
 
-def isolation_forest(df):
+def isolation_forest():
     st.header("Isolation Forest")
     model = IsolationForest()
     grid_params = {
@@ -132,7 +134,7 @@ def isolation_forest(df):
     else:
         print('Done')
     return isolation_forest
-def missing_values_imputation(df):
+def missing_values_imputation():
     st.header("Missing Values Imputation")
     # Your missing values imputation code here
     print(f'{df.isna().sum()}')

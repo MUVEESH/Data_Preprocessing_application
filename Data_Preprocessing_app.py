@@ -38,12 +38,8 @@ def main():
 
 def feature_engineering(df):
     st.header("Feature Engineering")
-    encoder={'Encoders':['OneHotEncoder','TargetEncoder']}
-    scaler={'Scalers':['MinMaxScaler','']}
-    for i,j in scaler.items():
-        encoder.setdefault(i,j)
-    st.write(pd.DataFrame(encoder))
-    encoder=input('Enter the encoder/scaler :')
+    encoders=['OneHotEncoder','TargetEncoder','MinMaxScaler']
+    encoder=st.selectbox("Select a Encoder/Scaler", encoders)
     if encoder=='OneHotEncoder':
         df1=pd.get_dummies(df)
         df.drop(df.columns, axis=1, inplace=True)
@@ -141,10 +137,11 @@ def missing_values_imputation(df):
     # Your missing values imputation code here
     print(f'{df.isna().sum()}')
     column = st.selectbox("Select a column for simple imputation", df.columns)
-    impute=input('Enter yes or no to impute :')
+    impute=st.input('Enter yes or no to impute :')
     try:
         if impute=='yes':
-            imputor=input('Enter imputer name median/mode/iterative :')
+            imputor_names=['median','mode',iterative]
+            imputor=st.selectbox('select imputer name')
             if imputor==median:
                 df.fillna(df[column].median())
             elif imputor==mode:

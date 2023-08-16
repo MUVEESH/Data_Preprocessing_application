@@ -1,5 +1,4 @@
 import streamlit as st
-import seaborn as sns
 import pandas as pd
 import base64
 from sklearn.preprocessing import MinMaxScaler
@@ -17,9 +16,14 @@ def main():
         df = pd.read_csv(uploaded_file)
         st.dataframe(df)
         feature_engineering(df)
-        z_score(df)
-        iqr(df)
-        isolation_forest(df)
+        anomaly=['none','z_score','iqr','isolation_forest']
+        outlier_detection=st.selectbox("Select a Encoder", anomaly)
+        if outlier_detection==z_score:
+            z_score(df)
+        if outlier_detection==iqr:
+            iqr(df)
+        if outlier_detection==isolation_forest:
+            isolation_forest(df)
         missing_values_imputation(df)
         
         # Display modified DataFrame
@@ -43,7 +47,7 @@ def feature_engineering(df):
         for j,i in enumerate(df[column].unique()):
             cat={i:j+1}
             df[column].replace(cat,inplace=True)
-    scalers=['MinMaxScaler','none']
+    scalers=['none','MinMaxScaler']
     scaler=st.selectbox("Select a scaler", scalers)
     for column in df.columns:
         if scaler=='MinMaxScaler':

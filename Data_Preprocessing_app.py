@@ -50,11 +50,11 @@ def feature_engineering(df):
             df[column].replace(cat,inplace=True)
     scalers=['none','MinMaxScaler']
     scaler=st.selectbox("Select a scaler", scalers)
-    for x in df.columns:
+    for col in df.columns:
         if scaler=='MinMaxScaler':
-            scaler=MinMaxScaler()
-            scaled_value=scaler.fit_transform(df[x].values.reshape(-1,1))
-            df[x]=scaled_value
+            min_val = df[col].min()
+            max_val = df[col].max()
+            df[col] = [(x - min_val) / (max_val - min_val) for x in col]
     st.write('Done')
 
 def z_score(df):

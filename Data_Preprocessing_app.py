@@ -17,8 +17,8 @@ def main():
         st.dataframe(df)
         feature_engineering(df)
         anomaly=['none','z_score','iqr','isolation_forest']
-        outlier_detection=st.selectbox("Select a Encoder", anomaly)
         st.header("Outlier_Detection")
+        outlier_detection=st.selectbox("Select a anomaly_detector", anomaly)
         if outlier_detection==z_score:
             z_score(df)
         elif outlier_detection==iqr:
@@ -58,7 +58,6 @@ def feature_engineering(df):
     st.write('Done')
 
 def z_score(df):
-    st.header("Z-Score")
     column = st.selectbox("Select a column for Z-Score", df.columns)
     outliers=[]
     skewness = df[column].skew()
@@ -81,7 +80,6 @@ def z_score(df):
     st.write('Done')
 
 def iqr(df):
-    st.header("IQR")
     column = st.selectbox("Select a column for IQR", df.columns)
     outliers=[]
     q1=df[column].quantile(0.25)
@@ -102,7 +100,6 @@ def iqr(df):
     st.write('Done')
 
 def isolation_forest(df):
-    st.header("Isolation Forest")
     model = IsolationForest()
     grid_params = {
         'contamination': [0.1, 0.2, 0.3, 0.4, 0.5, 0.6],

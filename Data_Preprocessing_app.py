@@ -50,11 +50,11 @@ def feature_engineering(df):
             df[column].replace(cat,inplace=True)
     scalers=['none','MinMaxScaler']
     scaler=st.selectbox("Select a scaler", scalers)
-    for column in df.columns:
+    for x in df.columns:
         if scaler=='MinMaxScaler':
             scaler=MinMaxScaler()
-            scaled_value=scaler.fit_transform(df[column].values.reshape(-1,1))
-            df[column]=scaled_value
+            scaled_value=scaler.fit_transform(df[x].values.reshape(-1,1))
+            df[x]=scaled_value
     st.write('Done')
 
 def z_score(df):
@@ -134,12 +134,12 @@ def missing_values_imputation(df):
     st.write(f'{df.isna().sum()}')
     option=['none','yes','no']
     impute=st.selectbox('select yes or no to impute ',option)
-    column = st.selectbox("Select a column for simple imputation", df.columns)
     
     try:
         if impute=='yes':
             imputor_names=['none','median','mode',iterative]
             imputor=st.selectbox('select imputer name')
+            column = st.selectbox("Select a column for simple imputation", df.columns)
             if imputor==median:
                 df.fillna(df[column].median())
             elif imputor==mode:

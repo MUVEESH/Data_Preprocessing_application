@@ -1,6 +1,5 @@
 import streamlit as st
 import pandas as pd
-import seaborn as sns
 import base64
 from sklearn.preprocessing import MinMaxScaler
 import warnings
@@ -70,7 +69,6 @@ def z_score(df):
         z=(x-mean)/std
         if z>3 or z<-3:
             outliers.append(x)
-    sns.kdeplot(df[column])
     out=0
     for i in outliers:
         out+=1

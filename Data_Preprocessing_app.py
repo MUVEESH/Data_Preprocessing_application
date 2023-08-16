@@ -30,7 +30,7 @@ def main():
 
 def feature_engineering(df):
     st.header("Feature Engineering")
-    encoders=['OneHotEncoder','TargetEncoder','none']
+    encoders=['none','OneHotEncoder','TargetEncoder']
     encoder=st.selectbox("Select a Encoder", encoders)
     if encoder=='OneHotEncoder':
         df1=pd.get_dummies(df)
@@ -134,7 +134,7 @@ def missing_values_imputation(df):
     impute=st.input('Enter yes or no to impute :')
     try:
         if impute=='yes':
-            imputor_names=['median','mode',iterative]
+            imputor_names=['none','median','mode',iterative]
             imputor=st.selectbox('select imputer name')
             if imputor==median:
                 df.fillna(df[column].median())

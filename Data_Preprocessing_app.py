@@ -134,9 +134,11 @@ def isolation_forest(df):
 def missing_values_imputation(df):
     st.header("Missing Values Imputation")
     # Your missing values imputation code here
-    print(f'{df.isna().sum()}')
+    st.write(f'{df.isna().sum()}')
+    option=['none','yes','no']
+    impute=st.selectbox('select yes or no to impute ',option)
     column = st.selectbox("Select a column for simple imputation", df.columns)
-    impute=st.input('Enter yes or no to impute :')
+    
     try:
         if impute=='yes':
             imputor_names=['none','median','mode',iterative]

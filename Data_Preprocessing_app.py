@@ -58,6 +58,7 @@ def feature_engineering(df):
             return scaled_data
         df=df.apply(minmax_scaler)
     st.write('Done')
+    return df
 
 def z_score(df):
     column = st.selectbox("Select a column for Z-Score", df.columns)

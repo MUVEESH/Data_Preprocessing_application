@@ -132,7 +132,7 @@ def isolation_forest(df):
         df.drop(['scores','anomaly_score'],axis=1,inplace=True)
     else:
         print('Done')
-    return isolation_forest
+    return df
     
 def missing_values_imputation(df):
     st.header("Missing Values Imputation")

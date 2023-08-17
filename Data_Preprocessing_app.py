@@ -53,9 +53,7 @@ def feature_engineering(df):
     def minmax_scaler(data):
         min_val = data.min()
         max_val = data.max()
-    
         scaled_data = (data - min_val) / (max_val - min_val)
-    
         return scaled_data
     if scaler=='MinMaxScaler':
        df.apply(minmax_scaler)

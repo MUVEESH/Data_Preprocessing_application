@@ -57,8 +57,7 @@ def feature_engineering(df):
         return scaled_data
     scaled_df=df.apply(minmax_scaler)
     if scaler=='MinMaxScaler':
-        st.write("Scaled DataFrame:")
-        st.write(scaled_df)
+        df=scaled_df
     st.write('Done')
 
 def z_score(df):

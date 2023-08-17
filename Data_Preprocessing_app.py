@@ -56,11 +56,11 @@ def feature_engineering(df):
             max_val = data.max()
             scaled_data = (data - min_val) / (max_val - min_val)
             return scaled_data
-        df=df.apply(minmax_scaler)
+        dff=df.apply(minmax_scaler)
     st.write('Done')
-    return df
+    return dff
 
-def z_score(df):
+def z_score(df=dff):
     column = st.selectbox("Select a column for Z-Score", df.columns)
     outliers=[]
     skewness = df[column].skew()
@@ -82,7 +82,7 @@ def z_score(df):
         df.drop(outliers, inplace=True)
     st.write('Done')
 
-def iqr(df):
+def iqr(df=dff):
     column = st.selectbox("Select a column for IQR", df.columns)
     outliers=[]
     q1=df[column].quantile(0.25)
@@ -102,7 +102,7 @@ def iqr(df):
         df.drop(outliers, inplace=True)
     st.write('Done')
 
-def isolation_forest(df):
+def isolation_forest(df=dff):
     model = IsolationForest()
     grid_params = {
         'contamination': [0.1, 0.2, 0.3, 0.4, 0.5, 0.6],
@@ -156,7 +156,7 @@ def missing_values_imputation(df):
     except NameError:
         print('Error:You should type only listed - kindly rerun')
 
-def get_download_link(df):
+def get_download_link(df=dff):
     csv = df.to_csv(index=False)
     b64 = base64.b64encode(csv.encode()).decode()
     href = f'<a href="data:file/csv;base64,{b64}" download="modified_data.csv">Download Modified CSV</a>'

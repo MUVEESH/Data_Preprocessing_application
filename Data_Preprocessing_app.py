@@ -52,7 +52,8 @@ def feature_engineering(df):
     scaler=st.selectbox("Select a scaler", scalers)
     if scaler=='MinMaxScaler':
        minmax=MinMaxScaler()
-       df=minmax.fit_transform(df)
+       for m in df.columns:
+           df=minmax.fit_transform(df[m])
     st.write('Done')
     return df
 

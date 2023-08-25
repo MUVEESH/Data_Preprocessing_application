@@ -53,7 +53,8 @@ def feature_engineering(df):
     if scaler=='MinMaxScaler':
        minmax=MinMaxScaler()
        for m in df.columns:
-           df=minmax.fit_transform(df[m]).reshape(-1, 1)
+           if df[column].dtype != 'object': 
+                df[column] = minmax.fit_transform(df[[column]]).reshape(-1,1)
     st.write('Done')
     return df
 
